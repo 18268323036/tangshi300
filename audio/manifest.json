@@ -1,0 +1,419 @@
+{
+  "generatedAt": "2026-05-15T07:54:00.944Z",
+  "voices": {
+    "female": {
+      "label": "女声"
+    },
+    "child": {
+      "label": "童声"
+    }
+  },
+  "tracks": {
+    "0": {
+      "title": "静夜思",
+      "author": "李白",
+      "audio": {
+        "female": {
+          "src": "audio/female/0.mp3",
+          "duration": 6.58275
+        },
+        "child": {
+          "src": "audio/child/0.mp3",
+          "duration": 6.552
+        }
+      }
+    },
+    "1": {
+      "title": "春晓",
+      "author": "孟浩然",
+      "audio": {
+        "female": {
+          "src": "audio/female/1.mp3",
+          "duration": 6.191
+        },
+        "child": {
+          "src": "audio/child/1.mp3",
+          "duration": 6.66
+        }
+      }
+    },
+    "2": {
+      "title": "登鹳雀楼",
+      "author": "王之涣",
+      "audio": {
+        "female": {
+          "src": "audio/female/2.mp3",
+          "duration": 6.7395
+        },
+        "child": {
+          "src": "audio/child/2.mp3",
+          "duration": 7.596
+        }
+      }
+    },
+    "3": {
+      "title": "望庐山瀑布",
+      "author": "李白",
+      "audio": {
+        "female": {
+          "src": "audio/female/3.mp3",
+          "duration": 8.307
+        },
+        "child": {
+          "src": "audio/child/3.mp3",
+          "duration": 8.388
+        }
+      }
+    },
+    "4": {
+      "title": "绝句",
+      "author": "杜甫",
+      "audio": {
+        "female": {
+          "src": "audio/female/4.mp3",
+          "duration": 8.307
+        },
+        "child": {
+          "src": "audio/child/4.mp3",
+          "duration": 7.956
+        }
+      }
+    },
+    "5": {
+      "title": "悯农",
+      "author": "李绅",
+      "audio": {
+        "female": {
+          "src": "audio/female/5.mp3",
+          "duration": 6.47825
+        },
+        "child": {
+          "src": "audio/child/5.mp3",
+          "duration": 5.832
+        }
+      }
+    },
+    "6": {
+      "title": "江雪",
+      "author": "柳宗元",
+      "audio": {
+        "female": {
+          "src": "audio/female/6.mp3",
+          "duration": 7.8105
+        },
+        "child": {
+          "src": "audio/child/6.mp3",
+          "duration": 6.876
+        }
+      }
+    },
+    "7": {
+      "title": "咏鹅",
+      "author": "骆宾王",
+      "audio": {
+        "female": {
+          "src": "audio/female/7.mp3",
+          "duration": 5.982
+        },
+        "child": {
+          "src": "audio/child/7.mp3",
+          "duration": 5.796
+        }
+      }
+    },
+    "8": {
+      "title": "早发白帝城",
+      "author": "李白",
+      "audio": {
+        "female": {
+          "src": "audio/female/8.mp3",
+          "duration": 9.24725
+        },
+        "child": {
+          "src": "audio/child/8.mp3",
+          "duration": 8.172
+        }
+      }
+    },
+    "9": {
+      "title": "相思",
+      "author": "王维",
+      "audio": {
+        "female": {
+          "src": "audio/female/9.mp3",
+          "duration": 6.21725
+        },
+        "child": {
+          "src": "audio/child/9.mp3",
+          "duration": 6.48
+        }
+      }
+    },
+    "10": {
+      "title": "鹿柴",
+      "author": "王维",
+      "audio": {
+        "female": {
+          "src": "audio/female/10.mp3",
+          "duration": 6.00825
+        },
+        "child": {
+          "src": "audio/child/10.mp3",
+          "duration": 5.868
+        }
+      }
+    },
+    "11": {
+      "title": "送元二使安西",
+      "author": "王维",
+      "audio": {
+        "female": {
+          "src": "audio/female/11.mp3",
+          "duration": 8.80325
+        },
+        "child": {
+          "src": "audio/child/11.mp3",
+          "duration": 9.252
+        }
+      }
+    },
+    "12": {
+      "title": "九月九日忆山东兄弟",
+      "author": "王维",
+      "audio": {
+        "female": {
+          "src": "audio/female/12.mp3",
+          "duration": 8.96
+        },
+        "child": {
+          "src": "audio/child/12.mp3",
+          "duration": 8.964
+        }
+      }
+    },
+    "13": {
+      "title": "出塞",
+      "author": "王昌龄",
+      "audio": {
+        "female": {
+          "src": "audio/female/13.mp3",
+          "duration": 7.915
+        },
+        "child": {
+          "src": "audio/child/13.mp3",
+          "duration": 8.568
+        }
+      }
+    },
+    "14": {
+      "title": "枫桥夜泊",
+      "author": "张继",
+      "audio": {
+        "female": {
+          "src": "audio/female/14.mp3",
+          "duration": 9.0645
+        },
+        "child": {
+          "src": "audio/child/14.mp3",
+          "duration": 8.496
+        }
+      }
+    },
+    "15": {
+      "title": "游子吟",
+      "author": "孟郊",
+      "audio": {
+        "female": {
+          "src": "audio/female/15.mp3",
+          "duration": 8.4375
+        },
+        "child": {
+          "src": "audio/child/15.mp3",
+          "duration": 8.928
+        }
+      }
+    },
+    "16": {
+      "title": "赋得古原草送别",
+      "author": "白居易",
+      "audio": {
+        "female": {
+          "src": "audio/female/16.mp3",
+          "duration": 8.098
+        },
+        "child": {
+          "src": "audio/child/16.mp3",
+          "duration": 6.876
+        }
+      }
+    },
+    "17": {
+      "title": "回乡偶书",
+      "author": "贺知章",
+      "audio": {
+        "female": {
+          "src": "audio/female/17.mp3",
+          "duration": 7.706
+        },
+        "child": {
+          "src": "audio/child/17.mp3",
+          "duration": 8.424
+        }
+      }
+    },
+    "18": {
+      "title": "凉州词",
+      "author": "王翰",
+      "audio": {
+        "female": {
+          "src": "audio/female/18.mp3",
+          "duration": 8.38525
+        },
+        "child": {
+          "src": "audio/child/18.mp3",
+          "duration": 8.028
+        }
+      }
+    },
+    "19": {
+      "title": "望天门山",
+      "author": "李白",
+      "audio": {
+        "female": {
+          "src": "audio/female/19.mp3",
+          "duration": 8.098
+        },
+        "child": {
+          "src": "audio/child/19.mp3",
+          "duration": 9
+        }
+      }
+    },
+    "20": {
+      "title": "夜宿山寺",
+      "author": "李白",
+      "audio": {
+        "female": {
+          "src": "audio/female/20.mp3",
+          "duration": 6.7395
+        },
+        "child": {
+          "src": "audio/child/20.mp3",
+          "duration": 6.3
+        }
+      }
+    },
+    "21": {
+      "title": "清明",
+      "author": "杜牧",
+      "audio": {
+        "female": {
+          "src": "audio/female/21.mp3",
+          "duration": 7.8105
+        },
+        "child": {
+          "src": "audio/child/21.mp3",
+          "duration": 7.272
+        }
+      }
+    },
+    "22": {
+      "title": "山行",
+      "author": "杜牧",
+      "audio": {
+        "female": {
+          "src": "audio/female/22.mp3",
+          "duration": 7.706
+        },
+        "child": {
+          "src": "audio/child/22.mp3",
+          "duration": 7.668
+        }
+      }
+    },
+    "23": {
+      "title": "乐游原",
+      "author": "李商隐",
+      "audio": {
+        "female": {
+          "src": "audio/female/23.mp3",
+          "duration": 6.844
+        },
+        "child": {
+          "src": "audio/child/23.mp3",
+          "duration": 6.336
+        }
+      }
+    },
+    "24": {
+      "title": "池上",
+      "author": "白居易",
+      "audio": {
+        "female": {
+          "src": "audio/female/24.mp3",
+          "duration": 6.58275
+        },
+        "child": {
+          "src": "audio/child/24.mp3",
+          "duration": 6.264
+        }
+      }
+    },
+    "25": {
+      "title": "寻隐者不遇",
+      "author": "贾岛",
+      "audio": {
+        "female": {
+          "src": "audio/female/25.mp3",
+          "duration": 6.76575
+        },
+        "child": {
+          "src": "audio/child/25.mp3",
+          "duration": 6.696
+        }
+      }
+    },
+    "26": {
+      "title": "芙蓉楼送辛渐",
+      "author": "王昌龄",
+      "audio": {
+        "female": {
+          "src": "audio/female/26.mp3",
+          "duration": 9.169
+        },
+        "child": {
+          "src": "audio/child/26.mp3",
+          "duration": 9.144
+        }
+      }
+    },
+    "27": {
+      "title": "竹里馆",
+      "author": "王维",
+      "audio": {
+        "female": {
+          "src": "audio/female/27.mp3",
+          "duration": 6.11275
+        },
+        "child": {
+          "src": "audio/child/27.mp3",
+          "duration": 6.156
+        }
+      }
+    },
+    "28": {
+      "title": "乌衣巷",
+      "author": "刘禹锡",
+      "audio": {
+        "female": {
+          "src": "audio/female/28.mp3",
+          "duration": 8.725
+        },
+        "child": {
+          "src": "audio/child/28.mp3",
+          "duration": 8.712
+        }
+      }
+    }
+  }
+}
