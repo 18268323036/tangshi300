@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>唐诗三百首</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#faf8f5;--card:#fff;--text:#2c2c2c;--sub:#8a8a8a;
+    --accent:#c4956a;--accent2:#a07850;--border:#e8e4df;
+    --pinyin:#b08d6e;--shadow:0 2px 16px rgba(0,0,0,.06);
+    --radius:12px;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;
+  }
+  /* Header */
+  .header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(250,248,245,.92);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);padding:12px 20px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .header h1{font-size:20px;font-weight:600;color:var(--accent2);letter-spacing:2px}
+  .header .back-btn{
+    display:none;background:none;border:none;font-size:18px;
+    color:var(--accent);cursor:pointer;padding:4px 12px;border-radius:8px;
+  }
+  .header .back-btn:hover{background:rgba(196,149,106,.1)}
+  /* Search */
+  .search-box{
+    position:relative;max-width:220px;
+  }
+  .search-box input{
+    width:100%;padding:6px 12px 6px 32px;border:1px solid var(--border);
+    border-radius:20px;font-size:13px;background:var(--card);outline:none;
+    transition:border-color .2s;
+  }
+  .search-box input:focus{border-color:var(--accent)}
+  .search-box::before{
+    content:"🔍";position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;
+  }
+  /* Home Grid */
+  .home{padding:16px 20px 80px}
+  .section-title{
+    font-size:15px;font-weight:600;color:var(--accent2);
+    margin:20px 0 12px;padding-left:4px;
+  }
+  .poem-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+    gap:12px;
+  }
+  .poem-card{
+    background:var(--card);border-radius:var(--radius);padding:16px;
+    box-shadow:var(--shadow);cursor:pointer;transition:all .25s;
+    border:1px solid transparent;position:relative;overflow:hidden;
+  }
+  .poem-card:hover{
+    transform:translateY(-2px);box-shadow:0 4px 24px rgba(0,0,0,.1);
+    border-color:var(--accent);
+  }
+  .poem-card .card-title{font-size:16px;font-weight:600;margin-bottom:4px}
+  .poem-card .card-author{font-size:12px;color:var(--sub)}
+  .poem-card .card-preview{
+    font-size:13px;color:var(--sub);margin-top:8px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  /* Detail View */
+  .detail{display:none;padding:0 20px 80px;max-width:640px;margin:0 auto}
+  .detail.active{display:block}
+  .home.hidden{display:none}
+  /* Image Carousel */
+  .carousel{
+    position:relative;width:100%;aspect-ratio:16/10;border-radius:var(--radius);
+    overflow:hidden;background:#e8e4df;margin:16px 0;
+  }
+  .carousel img{
+    width:100%;height:100%;object-fit:cover;
+    transition:opacity .8s ease;position:absolute;top:0;left:0;
+  }
+  .carousel img.active{opacity:1}
+  .carousel img.inactive{opacity:0}
+  .carousel-dots{
+    position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+    display:flex;gap:6px;
+  }
+  .carousel-dots span{
+    width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);
+    transition:all .3s;
+  }
+  .carousel-dots span.active{background:#fff;width:18px;border-radius:3px}
+  /* Poem Content */
+  .poem-meta{text-align:center;margin:16px 0 8px}
+  .poem-meta h2{font-size:22px;font-weight:700;margin-bottom:4px}
+  .poem-meta .author{font-size:14px;color:var(--sub)}
+  .poem-dynasty{font-size:12px;color:var(--sub);background:rgba(196,149,106,.1);
+    padding:2px 10px;border-radius:10px;display:inline-block;margin-left:6px}
+  .poem-body{
+    background:var(--card);border-radius:var(--radius);padding:24px 20px;
+    box-shadow:var(--shadow);margin:16px 0;
+  }
+  .poem-line{
+    text-align:center;margin:12px 0;font-size:22px;letter-spacing:2px;
+    line-height:2.2;padding:4px 10px;border-radius:10px;
+    transition:background-color .25s ease,color .25s ease,box-shadow .25s ease;
+  }
+  .poem-line.reading{
+    background:rgba(196,149,106,.12);color:var(--accent2);
+    box-shadow:inset 0 0 0 1px rgba(196,149,106,.18);
+  }
+  .poem-line .char-group{display:inline-block;margin:0 2px}
+  .poem-line .pinyin{
+    display:block;font-size:11px;color:var(--pinyin);
+    font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+    letter-spacing:0;margin-bottom:2px;
+  }
+  .poem-line .char{
+    font-size:22px;font-weight:500;
+  }
+  .poem-line .char.reading{
+    color:var(--accent);transition:color .3s;
+  }
+  /* Controls */
+  .controls{
+    display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;
+    margin:20px 0;padding:16px;background:var(--card);border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+  .btn{
+    border:none;border-radius:50%;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .2s;background:var(--accent);color:#fff;
+  }
+  .btn:hover{background:var(--accent2);transform:scale(1.05)}
+  .btn-play{width:52px;height:52px;font-size:22px}
+  .btn-sm{width:36px;height:36px;font-size:16px;background:var(--border);color:var(--text)}
+  .btn-sm:hover{background:#d4d0cb}
+  .speed-label{font-size:12px;color:var(--sub);min-width:30px;text-align:center}
+  .voice-switch{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .voice-btn{
+    border:1px solid var(--border);background:var(--card);color:var(--text);
+    border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer;
+    transition:all .2s;
+  }
+  .voice-btn:hover{border-color:var(--accent);color:var(--accent2)}
+  .voice-btn.active{
+    background:rgba(196,149,106,.12);border-color:var(--accent);color:var(--accent2);
+  }
+  .audio-status{
+    min-height:20px;margin-top:10px;text-align:center;font-size:12px;color:var(--sub);
+  }
+  /* Progress */
+  .progress-bar{
+    width:100%;height:3px;background:var(--border);border-radius:2px;
+    margin-top:12px;overflow:hidden;
+  }
+  .progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;
+    transition:width .3s;width:0}
+  /* Empty State */
+  .empty{text-align:center;padding:60px 20px;color:var(--sub)}
+  .empty .icon{font-size:48px;margin-bottom:12px}
+  /* Loading */
+  .loading-overlay{
+    position:fixed;inset:0;background:rgba(250,248,245,.9);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:999;transition:opacity .5s;
+  }
+  .loading-overlay.hide{opacity:0;pointer-events:none}
+  .loading-text{font-size:14px;color:var(--sub);margin-top:16px}
+  .spinner{
+    width:36px;height:36px;border:3px solid var(--border);
+    border-top-color:var(--accent);border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* Responsive */
+  @media(max-width:480px){
+    .poem-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .poem-line{font-size:20px}
+    .poem-line .char{font-size:20px}
+    .carousel{aspect-ratio:4/3}
+  }
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+  /* Fade animation */
+  .fade-in{animation:fadeIn .4s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">诗韵加载中...</div>
+</div>
+
+<div class="header">
+  <button class="back-btn" id="backBtn" onclick="goHome()">← 返回</button>
+  <h1>📜 唐诗三百首</h1>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="搜索诗名、作者..." oninput="filterPoems()">
+  </div>
+</div>
+
+<div class="home" id="homeView">
+  <div class="section-title">精选唐诗</div>
+  <div class="poem-grid" id="poemGrid"></div>
+</div>
+
+<div class="detail" id="detailView">
+  <div class="carousel" id="carousel">
+    <img src="" alt="" class="active" id="img0">
+    <img src="" alt="" class="inactive" id="img1">
+    <img src="" alt="" class="inactive" id="img2">
+    <div class="carousel-dots">
+      <span class="active" data-i="0"></span>
+      <span data-i="1"></span>
+      <span data-i="2"></span>
+    </div>
+  </div>
+  <div class="poem-meta">
+    <h2 id="poemTitle"></h2>
+    <div><span class="author" id="poemAuthor"></span><span class="poem-dynasty" id="poemDynasty"></span></div>
+  </div>
+  <div class="poem-body" id="poemBody"></div>
+  <div class="controls">
+    <div class="voice-switch" id="voiceSwitch">
+      <button class="voice-btn" id="voiceFemaleBtn" type="button" onclick="setVoiceMode('female')">女声</button>
+      <button class="voice-btn" id="voiceChildBtn" type="button" onclick="setVoiceMode('child')">童声</button>
+    </div>
+    <button class="btn btn-sm" onclick="changeSpeed(-1)" title="减速">🐢</button>
+    <button class="btn btn-play" id="playBtn" onclick="togglePlay()">▶</button>
+    <button class="btn btn-sm" onclick="changeSpeed(1)" title="加速">🐇</button>
+    <span class="speed-label" id="speedLabel">1.0x</span>
+  </div>
+  <div class="audio-status" id="audioStatus"></div>
+  <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+  <audio id="poemAudio" preload="metadata"></audio>
+</div>
+
+<script>
+// ==================== 精选唐诗数据 ====================
+const poems = [
+  {
+    title:"静夜思",author:"李白",dynasty:"唐",
+    lines:[
+      [{c:"床",p:"chuáng"},{c:"前",p:"qián"},{c:"明",p:"míng"},{c:"月",p:"yuè"},{c:"光",p:"guāng"}],
+      [{c:"疑",p:"yí"},{c:"是",p:"shì"},{c:"地",p:"dì"},{c:"上",p:"shàng"},{c:"霜",p:"shuāng"}],
+      [{c:"举",p:"jǔ"},{c:"头",p:"tóu"},{c:"望",p:"wàng"},{c:"明",p:"míng"},{c:"月",p:"yuè"}],
+      [{c:"低",p:"dī"},{c:"头",p:"tóu"},{c:"思",p:"sī"},{c:"故",p:"gù"},{c:"乡",p:"xiāng"}]
+    ],
+    desc:"月夜思乡"
+  },
+  {
+    title:"春晓",author:"孟浩然",dynasty:"唐",
+    lines:[
+      [{c:"春",p:"chūn"},{c:"眠",p:"mián"},{c:"不",p:"bù"},{c:"觉",p:"jué"},{c:"晓",p:"xiǎo"}],
+      [{c:"处",p:"chù"},{c:"处",p:"chù"},{c:"闻",p:"wén"},{c:"啼",p:"tí"},{c:"鸟",p:"niǎo"}],
+      [{c:"夜",p:"yè"},{c:"来",p:"lái"},{c:"风",p:"fēng"},{c:"雨",p:"yǔ"},{c:"声",p:"shēng"}],
+      [{c:"花",p:"huā"},{c:"落",p:"luò"},{c:"知",p:"zhī"},{c:"多",p:"duō"},{c:"少",p:"shǎo"}]
+    ],
+    desc:"春日清晨"
+  },
+  {
+    title:"登鹳雀楼",author:"王之涣",dynasty:"唐",
+    lines:[
+      [{c:"白",p:"bái"},{c:"日",p:"rì"},{c:"依",p:"yī"},{c:"山",p:"shān"},{c:"尽",p:"jìn"}],
+      [{c:"黄",p:"huáng"},{c:"河",p:"hé"},{c:"入",p:"rù"},{c:"海",p:"hǎi"},{c:"流",p:"liú"}],
+      [{c:"欲",p:"yù"},{c:"穷",p:"qióng"},{c:"千",p:"qiān"},{c:"里",p:"lǐ"},{c:"目",p:"mù"}],
+      [{c:"更",p:"gèng"},{c:"上",p:"shàng"},{c:"一",p:"yī"},{c:"层",p:"céng"},{c:"楼",p:"lóu"}]
+    ],
+    desc:"登高望远"
+  },
+  {
+    title:"望庐山瀑布",author:"李白",dynasty:"唐",
+    lines:[
+      [{c:"日",p:"rì"},{c:"照",p:"zhào"},{c:"香",p:"xiāng"},{c:"炉",p:"lú"},{c:"生",p:"shēng"},{c:"紫",p:"zǐ"},{c:"烟",p:"yān"}],
+      [{c:"遥",p:"yáo"},{c:"看",p:"kàn"},{c:"瀑",p:"pù"},{c:"布",p:"bù"},{c:"挂",p:"guà"},{c:"前",p:"qián"},{c:"川",p:"chuān"}],
+      [{c:"飞",p:"fēi"},{c:"流",p:"liú"},{c:"直",p:"zhí"},{c:"下",p:"xià"},{c:"三",p:"sān"},{c:"千",p:"qiān"},{c:"尺",p:"chǐ"}],
+      [{c:"疑",p:"yí"},{c:"是",p:"shì"},{c:"银",p:"yín"},{c:"河",p:"hé"},{c:"落",p:"luò"},{c:"九",p:"jiǔ"},{c:"天",p:"tiān"}]
+    ],
+    desc:"庐山瀑布"
+  },
+  {
+    title:"绝句",author:"杜甫",dynasty:"唐",
+    lines:[
+      [{c:"两",p:"liǎng"},{c:"个",p:"gè"},{c:"黄",p:"huáng"},{c:"鹂",p:"lí"},{c:"鸣",p:"míng"},{c:"翠",p:"cuì"},{c:"柳",p:"liǔ"}],
+      [{c:"一",p:"yī"},{c:"行",p:"háng"},{c:"白",p:"bái"},{c:"鹭",p:"lù"},{c:"上",p:"shàng"},{c:"青",p:"qīng"},{c:"天",p:"tiān"}],
+      [{c:"窗",p:"chuāng"},{c:"含",p:"hán"},{c:"西",p:"xī"},{c:"岭",p:"lǐng"},{c:"千",p:"qiān"},{c:"秋",p:"qiū"},{c:"雪",p:"xuě"}],
+      [{c:"门",p:"mén"},{c:"泊",p:"bó"},{c:"东",p:"dōng"},{c:"吴",p:"wú"},{c:"万",p:"wàn"},{c:"里",p:"lǐ"},{c:"船",p:"chuán"}]
+    ],
+    desc:"春日美景"
+  },
+  {
+    title:"悯农",author:"李绅",dynasty:"唐",
+    lines:[
+      [{c:"锄",p:"chú"},{c:"禾",p:"hé"},{c:"日",p:"rì"},{c:"当",p:"dāng"},{c:"午",p:"wǔ"}],
+      [{c:"汗",p:"hàn"},{c:"滴",p:"dī"},{c:"禾",p:"hé"},{c:"下",p:"xià"},{c:"土",p:"tǔ"}],
+      [{c:"谁",p:"shuí"},{c:"知",p:"zhī"},{c:"盘",p:"pán"},{c:"中",p:"zhōng"},{c:"餐",p:"cān"}],
+      [{c:"粒",p:"lì"},{c:"粒",p:"lì"},{c:"皆",p:"jiē"},{c:"辛",p:"xīn"},{c:"苦",p:"kǔ"}]
+    ],
+    desc:"农人辛劳"
+  },
+  {
+    title:"江雪",author:"柳宗元",dynasty:"唐",
+    lines:[
+      [{c:"千",p:"qiān"},{c:"山",p:"shān"},{c:"鸟",p:"niǎo"},{c:"飞",p:"fēi"},{c:"绝",p:"jué"}],
+      [{c:"万",p:"wàn"},{c:"径",p:"jìng"},{c:"人",p:"rén"},{c:"踪",p:"zōng"},{c:"灭",p:"miè"}],
+      [{c:"孤",p:"gū"},{c:"舟",p:"zhōu"},{c:"蓑",p:"suō"},{c:"笠",p:"lì"},{c:"翁",p:"wēng"}],
+      [{c:"独",p:"dú"},{c:"钓",p:"diào"},{c:"寒",p:"hán"},{c:"江",p:"jiāng"},{c:"雪",p:"xuě"}]
+    ],
+    desc:"寒江独钓"
+  },
+  {
+    title:"咏鹅",author:"骆宾王",dynasty:"唐",
+    lines:[
+      [{c:"鹅",p:"é"},{c:"鹅",p:"é"},{c:"鹅",p:"é"}],
+      [{c:"曲",p:"qū"},{c:"项",p:"xiàng"},{c:"向",p:"xiàng"},{c:"天",p:"tiān"},{c:"歌",p:"gē"}],
+      [{c:"白",p:"bái"},{c:"毛",p:"máo"},{c:"浮",p:"fú"},{c:"绿",p:"lǜ"},{c:"水",p:"shuǐ"}],
+      [{c:"红",p:"hóng"},{c:"掌",p:"zhǎng"},{c:"拨",p:"bō"},{c:"清",p:"qīng"},{c:"波",p:"bō"}]
+    ],
+    desc:"白鹅戏水"
+  },
+  {
+    title:"早发白帝城",author:"李白",dynasty:"唐",
+    lines:[
+      [{c:"朝",p:"zhāo"},{c:"辞",p:"cí"},{c:"白",p:"bái"},{c:"帝",p:"dì"},{c:"彩",p:"cǎi"},{c:"云",p:"yún"},{c:"间",p:"jiān"}],
+      [{c:"千",p:"qiān"},{c:"里",p:"lǐ"},{c:"江",p:"jiāng"},{c:"陵",p:"líng"},{c:"一",p:"yī"},{c:"日",p:"rì"},{c:"还",p:"huán"}],
+      [{c:"两",p:"liǎng"},{c:"岸",p:"àn"},{c:"猿",p:"yuán"},{c:"声",p:"shēng"},{c:"啼",p:"tí"},{c:"不",p:"bù"},{c:"住",p:"zhù"}],
+      [{c:"轻",p:"qīng"},{c:"舟",p:"zhōu"},{c:"已",p:"yǐ"},{c:"过",p:"guò"},{c:"万",p:"wàn"},{c:"重",p:"chóng"},{c:"山",p:"shān"}]
+    ],
+    desc:"轻舟疾行"
+  },
+  {
+    title:"相思",author:"王维",dynasty:"唐",
+    lines:[
+      [{c:"红",p:"hóng"},{c:"豆",p:"dòu"},{c:"生",p:"shēng"},{c:"南",p:"nán"},{c:"国",p:"guó"}],
+      [{c:"春",p:"chūn"},{c:"来",p:"lái"},{c:"发",p:"fā"},{c:"几",p:"jǐ"},{c:"枝",p:"zhī"}],
+      [{c:"愿",p:"yuàn"},{c:"君",p:"jūn"},{c:"多",p:"duō"},{c:"采",p:"cǎi"},{c:"撷",p:"xié"}],
+      [{c:"此",p:"cǐ"},{c:"物",p:"wù"},{c:"最",p:"zuì"},{c:"相",p:"xiāng"},{c:"思",p:"sī"}]
+    ],
+    desc:"红豆相思"
+  },
+  {
+    title:"鹿柴",author:"王维",dynasty:"唐",
+    lines:[
+      [{c:"空",p:"kōng"},{c:"山",p:"shān"},{c:"不",p:"bù"},{c:"见",p:"jiàn"},{c:"人",p:"rén"}],
+      [{c:"但",p:"dàn"},{c:"闻",p:"wén"},{c:"人",p:"rén"},{c:"语",p:"yǔ"},{c:"响",p:"xiǎng"}],
+      [{c:"返",p:"fǎn"},{c:"景",p:"jǐng"},{c:"入",p:"rù"},{c:"深",p:"shēn"},{c:"林",p:"lín"}],
+      [{c:"复",p:"fù"},{c:"照",p:"zhào"},{c:"青",p:"qīng"},{c:"苔",p:"tái"},{c:"上",p:"shàng"}]
+    ],
+    desc:"空山幽静"
+  },
+  {
+    title:"送元二使安西",author:"王维",dynasty:"唐",
+    lines:[
+      [{c:"渭",p:"wèi"},{c:"城",p:"chéng"},{c:"朝",p:"zhāo"},{c:"雨",p:"yǔ"},{c:"浥",p:"yì"},{c:"轻",p:"qīng"},{c:"尘",p:"chén"}],
+      [{c:"客",p:"kè"},{c:"舍",p:"shè"},{c:"青",p:"qīng"},{c:"青",p:"qīng"},{c:"柳",p:"liǔ"},{c:"色",p:"sè"},{c:"新",p:"xīn"}],
+      [{c:"劝",p:"quàn"},{c:"君",p:"jūn"},{c:"更",p:"gèng"},{c:"尽",p:"jìn"},{c:"一",p:"yī"},{c:"杯",p:"bēi"},{c:"酒",p:"jiǔ"}],
+      [{c:"西",p:"xī"},{c:"出",p:"chū"},{c:"阳",p:"yáng"},{c:"关",p:"guān"},{c:"无",p:"wú"},{c:"故",p:"gù"},{c:"人",p:"rén"}]
+    ],
+    desc:"渭城送别"
+  },
+  {
+    title:"九月九日忆山东兄弟",author:"王维",dynasty:"唐",
+    lines:[
+      [{c:"独",p:"dú"},{c:"在",p:"zài"},{c:"异",p:"yì"},{c:"乡",p:"xiāng"},{c:"为",p:"wéi"},{c:"异",p:"yì"},{c:"客",p:"kè"}],
+      [{c:"每",p:"měi"},{c:"逢",p:"féng"},{c:"佳",p:"jiā"},{c:"节",p:"jié"},{c:"倍",p:"bèi"},{c:"思",p:"sī"},{c:"亲",p:"qīn"}],
+      [{c:"遥",p:"yáo"},{c:"知",p:"zhī"},{c:"兄",p:"xiōng"},{c:"弟",p:"dì"},{c:"登",p:"dēng"},{c:"高",p:"gāo"},{c:"处",p:"chù"}],
+      [{c:"遍",p:"biàn"},{c:"插",p:"chā"},{c:"茱",p:"zhū"},{c:"萸",p:"yú"},{c:"少",p:"shǎo"},{c:"一",p:"yī"},{c:"人",p:"rén"}]
+    ],
+    desc:"重阳思亲"
+  },
+  {
+    title:"出塞",author:"王昌龄",dynasty:"唐",
+    lines:[
+      [{c:"秦",p:"qín"},{c:"时",p:"shí"},{c:"明",p:"míng"},{c:"月",p:"yuè"},{c:"汉",p:"hàn"},{c:"时",p:"shí"},{c:"关",p:"guān"}],
+      [{c:"万",p:"wàn"},{c:"里",p:"lǐ"},{c:"长",p:"cháng"},{c:"征",p:"zhēng"},{c:"人",p:"rén"},{c:"未",p:"wèi"},{c:"还",p:"huán"}],
+      [{c:"但",p:"dàn"},{c:"使",p:"shǐ"},{c:"龙",p:"lóng"},{c:"城",p:"chéng"},{c:"飞",p:"fēi"},{c:"将",p:"jiàng"},{c:"在",p:"zài"}],
+      [{c:"不",p:"bù"},{c:"教",p:"jiào"},{c:"胡",p:"hú"},{c:"马",p:"mǎ"},{c:"度",p:"dù"},{c:"阴",p:"yīn"},{c:"山",p:"shān"}]
+    ],
+    desc:"边塞壮志"
+  },
+  {
+    title:"枫桥夜泊",author:"张继",dynasty:"唐",
+    lines:[
+      [{c:"月",p:"yuè"},{c:"落",p:"luò"},{c:"乌",p:"wū"},{c:"啼",p:"tí"},{c:"霜",p:"shuāng"},{c:"满",p:"mǎn"},{c:"天",p:"tiān"}],
+      [{c:"江",p:"jiāng"},{c:"枫",p:"fēng"},{c:"渔",p:"yú"},{c:"火",p:"huǒ"},{c:"对",p:"duì"},{c:"愁",p:"chóu"},{c:"眠",p:"mián"}],
+      [{c:"姑",p:"gū"},{c:"苏",p:"sū"},{c:"城",p:"chéng"},{c:"外",p:"wài"},{c:"寒",p:"hán"},{c:"山",p:"shān"},{c:"寺",p:"sì"}],
+      [{c:"夜",p:"yè"},{c:"半",p:"bàn"},{c:"钟",p:"zhōng"},{c:"声",p:"shēng"},{c:"到",p:"dào"},{c:"客",p:"kè"},{c:"船",p:"chuán"}]
+    ],
+    desc:"夜泊枫桥"
+  },
+  {
+    title:"游子吟",author:"孟郊",dynasty:"唐",
+    lines:[
+      [{c:"慈",p:"cí"},{c:"母",p:"mǔ"},{c:"手",p:"shǒu"},{c:"中",p:"zhōng"},{c:"线",p:"xiàn"}],
+      [{c:"游",p:"yóu"},{c:"子",p:"zǐ"},{c:"身",p:"shēn"},{c:"上",p:"shàng"},{c:"衣",p:"yī"}],
+      [{c:"临",p:"lín"},{c:"行",p:"xíng"},{c:"密",p:"mì"},{c:"密",p:"mì"},{c:"缝",p:"féng"}],
+      [{c:"意",p:"yì"},{c:"恐",p:"kǒng"},{c:"迟",p:"chí"},{c:"迟",p:"chí"},{c:"归",p:"guī"}],
+      [{c:"谁",p:"shuí"},{c:"言",p:"yán"},{c:"寸",p:"cùn"},{c:"草",p:"cǎo"},{c:"心",p:"xīn"}],
+      [{c:"报",p:"bào"},{c:"得",p:"dé"},{c:"三",p:"sān"},{c:"春",p:"chūn"},{c:"晖",p:"huī"}]
+    ],
+    desc:"母爱深情"
+  },
+  {
+    title:"赋得古原草送别",author:"白居易",dynasty:"唐",
+    lines:[
+      [{c:"离",p:"lí"},{c:"离",p:"lí"},{c:"原",p:"yuán"},{c:"上",p:"shàng"},{c:"草",p:"cǎo"}],
+      [{c:"一",p:"yī"},{c:"岁",p:"suì"},{c:"一",p:"yī"},{c:"枯",p:"kū"},{c:"荣",p:"róng"}],
+      [{c:"野",p:"yě"},{c:"火",p:"huǒ"},{c:"烧",p:"shāo"},{c:"不",p:"bù"},{c:"尽",p:"jìn"}],
+      [{c:"春",p:"chūn"},{c:"风",p:"fēng"},{c:"吹",p:"chuī"},{c:"又",p:"yòu"},{c:"生",p:"shēng"}]
+    ],
+    desc:"古原春草"
+  },
+  {
+    title:"回乡偶书",author:"贺知章",dynasty:"唐",
+    lines:[
+      [{c:"少",p:"shào"},{c:"小",p:"xiǎo"},{c:"离",p:"lí"},{c:"家",p:"jiā"},{c:"老",p:"lǎo"},{c:"大",p:"dà"},{c:"回",p:"huí"}],
+      [{c:"乡",p:"xiāng"},{c:"音",p:"yīn"},{c:"无",p:"wú"},{c:"改",p:"gǎi"},{c:"鬓",p:"bìn"},{c:"毛",p:"máo"},{c:"衰",p:"cuī"}],
+      [{c:"儿",p:"ér"},{c:"童",p:"tóng"},{c:"相",p:"xiāng"},{c:"见",p:"jiàn"},{c:"不",p:"bù"},{c:"相",p:"xiāng"},{c:"识",p:"shí"}],
+      [{c:"笑",p:"xiào"},{c:"问",p:"wèn"},{c:"客",p:"kè"},{c:"从",p:"cóng"},{c:"何",p:"hé"},{c:"处",p:"chù"},{c:"来",p:"lái"}]
+    ],
+    desc:"回乡感慨"
+  },
+  {
+    title:"凉州词",author:"王翰",dynasty:"唐",
+    lines:[
+      [{c:"葡",p:"pú"},{c:"萄",p:"táo"},{c:"美",p:"měi"},{c:"酒",p:"jiǔ"},{c:"夜",p:"yè"},{c:"光",p:"guāng"},{c:"杯",p:"bēi"}],
+      [{c:"欲",p:"yù"},{c:"饮",p:"yǐn"},{c:"琵",p:"pí"},{c:"琶",p:"pá"},{c:"马",p:"mǎ"},{c:"上",p:"shàng"},{c:"催",p:"cuī"}],
+      [{c:"醉",p:"zuì"},{c:"卧",p:"wò"},{c:"沙",p:"shā"},{c:"场",p:"chǎng"},{c:"君",p:"jūn"},{c:"莫",p:"mò"},{c:"笑",p:"xiào"}],
+      [{c:"古",p:"gǔ"},{c:"来",p:"lái"},{c:"征",p:"zhēng"},{c:"战",p:"zhàn"},{c:"几",p:"jǐ"},{c:"人",p:"rén"},{c:"回",p:"huí"}]
+    ],
+    desc:"边塞豪情"
+  },
+  {
+    title:"望天门山",author:"李白",dynasty:"唐",
+    lines:[
+      [{c:"天",p:"tiān"},{c:"门",p:"mén"},{c:"中",p:"zhōng"},{c:"断",p:"duàn"},{c:"楚",p:"chǔ"},{c:"江",p:"jiāng"},{c:"开",p:"kāi"}],
+      [{c:"碧",p:"bì"},{c:"水",p:"shuǐ"},{c:"东",p:"dōng"},{c:"流",p:"liú"},{c:"至",p:"zhì"},{c:"此",p:"cǐ"},{c:"回",p:"huí"}],
+      [{c:"两",p:"liǎng"},{c:"岸",p:"àn"},{c:"青",p:"qīng"},{c:"山",p:"shān"},{c:"相",p:"xiāng"},{c:"对",p:"duì"},{c:"出",p:"chū"}],
+      [{c:"孤",p:"gū"},{c:"帆",p:"fān"},{c:"一",p:"yī"},{c:"片",p:"piàn"},{c:"日",p:"rì"},{c:"边",p:"biān"},{c:"来",p:"lái"}]
+    ],
+    desc:"天门山景"
+  },
+  {
+    title:"夜宿山寺",author:"李白",dynasty:"唐",
+    lines:[
+      [{c:"危",p:"wēi"},{c:"楼",p:"lóu"},{c:"高",p:"gāo"},{c:"百",p:"bǎi"},{c:"尺",p:"chǐ"}],
+      [{c:"手",p:"shǒu"},{c:"可",p:"kě"},{c:"摘",p:"zhāi"},{c:"星",p:"xīng"},{c:"辰",p:"chén"}],
+      [{c:"不",p:"bù"},{c:"敢",p:"gǎn"},{c:"高",p:"gāo"},{c:"声",p:"shēng"},{c:"语",p:"yǔ"}],
+      [{c:"恐",p:"kǒng"},{c:"惊",p:"jīng"},{c:"天",p:"tiān"},{c:"上",p:"shàng"},{c:"人",p:"rén"}]
+    ],
+    desc:"山寺夜宿"
+  },
+  {
+    title:"清明",author:"杜牧",dynasty:"唐",
+    lines:[
+      [{c:"清",p:"qīng"},{c:"明",p:"míng"},{c:"时",p:"shí"},{c:"节",p:"jié"},{c:"雨",p:"yǔ"},{c:"纷",p:"fēn"},{c:"纷",p:"fēn"}],
+      [{c:"路",p:"lù"},{c:"上",p:"shàng"},{c:"行",p:"xíng"},{c:"人",p:"rén"},{c:"欲",p:"yù"},{c:"断",p:"duàn"},{c:"魂",p:"hún"}],
+      [{c:"借",p:"jiè"},{c:"问",p:"wèn"},{c:"酒",p:"jiǔ"},{c:"家",p:"jiā"},{c:"何",p:"hé"},{c:"处",p:"chù"},{c:"有",p:"yǒu"}],
+      [{c:"牧",p:"mù"},{c:"童",p:"tóng"},{c:"遥",p:"yáo"},{c:"指",p:"zhǐ"},{c:"杏",p:"xìng"},{c:"花",p:"huā"},{c:"村",p:"cūn"}]
+    ],
+    desc:"清明时节"
+  },
+  {
+    title:"山行",author:"杜牧",dynasty:"唐",
+    lines:[
+      [{c:"远",p:"yuǎn"},{c:"上",p:"shàng"},{c:"寒",p:"hán"},{c:"山",p:"shān"},{c:"石",p:"shí"},{c:"径",p:"jìng"},{c:"斜",p:"xiá"}],
+      [{c:"白",p:"bái"},{c:"云",p:"yún"},{c:"生",p:"shēng"},{c:"处",p:"chù"},{c:"有",p:"yǒu"},{c:"人",p:"rén"},{c:"家",p:"jiā"}],
+      [{c:"停",p:"tíng"},{c:"车",p:"chē"},{c:"坐",p:"zuò"},{c:"爱",p:"ài"},{c:"枫",p:"fēng"},{c:"林",p:"lín"},{c:"晚",p:"wǎn"}],
+      [{c:"霜",p:"shuāng"},{c:"叶",p:"yè"},{c:"红",p:"hóng"},{c:"于",p:"yú"},{c:"二",p:"èr"},{c:"月",p:"yuè"},{c:"花",p:"huā"}]
+    ],
+    desc:"秋山红叶"
+  },
+  {
+    title:"乐游原",author:"李商隐",dynasty:"唐",
+    lines:[
+      [{c:"向",p:"xiàng"},{c:"晚",p:"wǎn"},{c:"意",p:"yì"},{c:"不",p:"bù"},{c:"适",p:"shì"}],
+      [{c:"驱",p:"qū"},{c:"车",p:"chē"},{c:"登",p:"dēng"},{c:"古",p:"gǔ"},{c:"原",p:"yuán"}],
+      [{c:"夕",p:"xī"},{c:"阳",p:"yáng"},{c:"无",p:"wú"},{c:"限",p:"xiàn"},{c:"好",p:"hǎo"}],
+      [{c:"只",p:"zhǐ"},{c:"是",p:"shì"},{c:"近",p:"jìn"},{c:"黄",p:"huáng"},{c:"昏",p:"hūn"}]
+    ],
+    desc:"夕阳无限"
+  },
+  {
+    title:"池上",author:"白居易",dynasty:"唐",
+    lines:[
+      [{c:"小",p:"xiǎo"},{c:"娃",p:"wá"},{c:"撑",p:"chēng"},{c:"小",p:"xiǎo"},{c:"艇",p:"tǐng"}],
+      [{c:"偷",p:"tōu"},{c:"采",p:"cǎi"},{c:"白",p:"bái"},{c:"莲",p:"lián"},{c:"回",p:"huí"}],
+      [{c:"不",p:"bù"},{c:"解",p:"jiě"},{c:"藏",p:"cáng"},{c:"踪",p:"zōng"},{c:"迹",p:"jì"}],
+      [{c:"浮",p:"fú"},{c:"萍",p:"píng"},{c:"一",p:"yī"},{c:"道",p:"dào"},{c:"开",p:"kāi"}]
+    ],
+    desc:"小娃偷莲"
+  },
+  {
+    title:"寻隐者不遇",author:"贾岛",dynasty:"唐",
+    lines:[
+      [{c:"松",p:"sōng"},{c:"下",p:"xià"},{c:"问",p:"wèn"},{c:"童",p:"tóng"},{c:"子",p:"zǐ"}],
+      [{c:"言",p:"yán"},{c:"师",p:"shī"},{c:"采",p:"cǎi"},{c:"药",p:"yào"},{c:"去",p:"qù"}],
+      [{c:"只",p:"zhǐ"},{c:"在",p:"zài"},{c:"此",p:"cǐ"},{c:"山",p:"shān"},{c:"中",p:"zhōng"}],
+      [{c:"云",p:"yún"},{c:"深",p:"shēn"},{c:"不",p:"bù"},{c:"知",p:"zhī"},{c:"处",p:"chù"}]
+    ],
+    desc:"寻访隐者"
+  },
+  {
+    title:"芙蓉楼送辛渐",author:"王昌龄",dynasty:"唐",
+    lines:[
+      [{c:"寒",p:"hán"},{c:"雨",p:"yǔ"},{c:"连",p:"lián"},{c:"江",p:"jiāng"},{c:"夜",p:"yè"},{c:"入",p:"rù"},{c:"吴",p:"wú"}],
+      [{c:"平",p:"píng"},{c:"明",p:"míng"},{c:"送",p:"sòng"},{c:"客",p:"kè"},{c:"楚",p:"chǔ"},{c:"山",p:"shān"},{c:"孤",p:"gū"}],
+      [{c:"洛",p:"luò"},{c:"阳",p:"yáng"},{c:"亲",p:"qīn"},{c:"友",p:"yǒu"},{c:"如",p:"rú"},{c:"相",p:"xiāng"},{c:"问",p:"wèn"}],
+      [{c:"一",p:"yī"},{c:"片",p:"piàn"},{c:"冰",p:"bīng"},{c:"心",p:"xīn"},{c:"在",p:"zài"},{c:"玉",p:"yù"},{c:"壶",p:"hú"}]
+    ],
+    desc:"冰心玉壶"
+  },
+  {
+    title:"竹里馆",author:"王维",dynasty:"唐",
+    lines:[
+      [{c:"独",p:"dú"},{c:"坐",p:"zuò"},{c:"幽",p:"yōu"},{c:"篁",p:"huáng"},{c:"里",p:"lǐ"}],
+      [{c:"弹",p:"tán"},{c:"琴",p:"qín"},{c:"复",p:"fù"},{c:"长",p:"cháng"},{c:"啸",p:"xiào"}],
+      [{c:"深",p:"shēn"},{c:"林",p:"lín"},{c:"人",p:"rén"},{c:"不",p:"bù"},{c:"知",p:"zhī"}],
+      [{c:"明",p:"míng"},{c:"月",p:"yuè"},{c:"来",p:"lái"},{c:"相",p:"xiāng"},{c:"照",p:"zhào"}]
+    ],
+    desc:"竹林独坐"
+  },
+  {
+    title:"乌衣巷",author:"刘禹锡",dynasty:"唐",
+    lines:[
+      [{c:"朱",p:"zhū"},{c:"雀",p:"què"},{c:"桥",p:"qiáo"},{c:"边",p:"biān"},{c:"野",p:"yě"},{c:"草",p:"cǎo"},{c:"花",p:"huā"}],
+      [{c:"乌",p:"wū"},{c:"衣",p:"yī"},{c:"巷",p:"xiàng"},{c:"口",p:"kǒu"},{c:"夕",p:"xī"},{c:"阳",p:"yáng"},{c:"斜",p:"xiá"}],
+      [{c:"旧",p:"jiù"},{c:"时",p:"shí"},{c:"王",p:"wáng"},{c:"谢",p:"xiè"},{c:"堂",p:"táng"},{c:"前",p:"qián"},{c:"燕",p:"yàn"}],
+      [{c:"飞",p:"fēi"},{c:"入",p:"rù"},{c:"寻",p:"xún"},{c:"常",p:"cháng"},{c:"百",p:"bǎi"},{c:"姓",p:"xìng"},{c:"家",p:"jiā"}]
+    ],
+    desc:"历史沧桑"
+  }
+];
+
+// ==================== 全局状态 ====================
+const EMPTY_AUDIO_MANIFEST = { voices: {}, tracks: {} };
+let audioManifest = EMPTY_AUDIO_MANIFEST;
+let currentPoemIndex = null;
+let currentPoem = null;
+let isPlaying = false;
+let speechRate = 1.0;
+let currentCharIndex = 0;
+let currentLineIndex = -1;
+let totalChars = 0;
+let currentImgIndex = 0;
+let poemAudio = null;
+let playbackRequestToken = 0;
+let voiceMode = 'female';
+try {
+  voiceMode = localStorage.getItem('poemVoiceMode') || 'female';
+} catch (error) {}
+
+function updateVoiceButtons() {
+  const femaleBtn = document.getElementById('voiceFemaleBtn');
+  const childBtn = document.getElementById('voiceChildBtn');
+  femaleBtn?.classList?.toggle?.('active', voiceMode === 'female');
+  childBtn?.classList?.toggle?.('active', voiceMode === 'child');
+}
+
+function setAudioStatus(message) {
+  const status = document.getElementById('audioStatus');
+  if (status) status.textContent = message;
+}
+
+function invalidatePlaybackRequest() {
+  playbackRequestToken += 1;
+  return playbackRequestToken;
+}
+
+function isPlaybackRequestCurrent(token) {
+  return token === playbackRequestToken;
+}
+
+function ensurePoemAudio() {
+  if (!poemAudio) {
+    poemAudio = document.getElementById('poemAudio');
+  }
+  if (!poemAudio || poemAudio.__poemAudioBound) return poemAudio;
+
+  poemAudio.onloadedmetadata = () => {
+    poemAudio.playbackRate = speechRate;
+    const playBtn = document.getElementById('playBtn');
+    if (playBtn && poemAudio.src) playBtn.disabled = false;
+    if (resolveAudioTrack(currentPoemIndex, voiceMode)) {
+      setAudioStatus('');
+    }
+    syncPlaybackFrame();
+  };
+
+  poemAudio.ontimeupdate = () => {
+    syncPlaybackFrame();
+  };
+
+  poemAudio.onended = () => {
+    stopPlay();
+  };
+
+  poemAudio.onerror = () => {
+    isPlaying = false;
+    const playBtn = document.getElementById('playBtn');
+    if (playBtn) {
+      playBtn.textContent = '▶';
+      playBtn.disabled = true;
+    }
+    setAudioStatus('当前音频加载失败');
+  };
+
+  poemAudio.__poemAudioBound = true;
+  return poemAudio;
+}
+
+function syncPoemAudioSource(track) {
+  ensurePoemAudio();
+  if (!poemAudio) return;
+
+  if (track?.src) {
+    poemAudio.src = track.src;
+    if (poemAudio.dataset) poemAudio.dataset.trackSrc = track.src;
+    poemAudio.load?.();
+    return;
+  }
+
+  if (typeof poemAudio.removeAttribute === 'function') {
+    poemAudio.removeAttribute('src');
+  } else {
+    poemAudio.src = '';
+  }
+  if (poemAudio.dataset) poemAudio.dataset.trackSrc = '';
+  poemAudio.load?.();
+}
+
+async function loadAudioManifest() {
+  try {
+    if (typeof fetch !== 'function') {
+      throw new Error('fetch unavailable');
+    }
+    const response = await fetch('audio/manifest.json');
+    if (!response.ok) {
+      throw new Error(`manifest request failed: ${response.status}`);
+    }
+    const manifest = await response.json();
+    audioManifest = manifest && typeof manifest === 'object' ? manifest : EMPTY_AUDIO_MANIFEST;
+    updateVoiceButtons();
+    if (currentPoemIndex !== null) {
+      preparePoemAudio(currentPoemIndex);
+    }
+    return audioManifest;
+  } catch (error) {
+    audioManifest = { voices: {}, tracks: {} };
+    syncPoemAudioSource(null);
+    setAudioStatus('音频资源尚未准备好');
+    const playBtn = document.getElementById('playBtn');
+    if (playBtn) playBtn.disabled = true;
+    return audioManifest;
+  }
+}
+
+function resolveAudioTrack(poemId, mode = voiceMode) {
+  return audioManifest?.tracks?.[String(poemId)]?.audio?.[mode] || null;
+}
+
+function updateCurrentPoemAudioState() {
+  if (currentPoemIndex === null) return null;
+  return preparePoemAudio(currentPoemIndex);
+}
+
+function setVoiceMode(mode) {
+  voiceMode = mode === 'child' ? 'child' : 'female';
+  try {
+    localStorage.setItem('poemVoiceMode', voiceMode);
+  } catch (error) {}
+  updateVoiceButtons();
+
+  if (currentPoemIndex === null) return;
+  if (isPlaying) {
+    stopPlay();
+    void startPlay({ reset: true }).catch(() => {});
+    return;
+  }
+  preparePoemAudio(currentPoemIndex);
+}
+
+function preparePoemAudio(idx = currentPoemIndex) {
+  ensurePoemAudio();
+  if (idx === null || !poemAudio) return null;
+
+  const track = resolveAudioTrack(idx, voiceMode);
+  const playBtn = document.getElementById('playBtn');
+
+  syncPoemAudioSource(track);
+  poemAudio.playbackRate = speechRate;
+  poemAudio.currentTime = 0;
+
+  if (!track) {
+    const missingManifest = !Object.keys(audioManifest.voices || {}).length &&
+      !Object.keys(audioManifest.tracks || {}).length;
+    if (playBtn) playBtn.disabled = true;
+    setAudioStatus(missingManifest ? '音频资源尚未准备好' : '当前声音版本尚未生成');
+    return null;
+  }
+
+  if (playBtn) playBtn.disabled = false;
+  setAudioStatus('');
+  return track;
+}
+
+function clearLineHighlights() {
+  document.querySelectorAll('.poem-line.reading').forEach(el => el.classList.remove('reading'));
+  currentLineIndex = -1;
+}
+
+function getActiveLineIndex(progressRatio) {
+  if (!currentPoem?.lines?.length) return -1;
+
+  const clampedRatio = Math.max(0, Math.min(1, Number(progressRatio) || 0));
+  const introUnits = (currentPoem.title?.length || 0) + (currentPoem.author?.length || 0);
+  const lineUnits = currentPoem.lines.map(line => line.length);
+  const poemUnits = lineUnits.reduce((sum, count) => sum + count, 0);
+  const totalUnits = introUnits + poemUnits;
+  if (!totalUnits || !poemUnits) return -1;
+
+  const bodyPosition = clampedRatio * totalUnits - introUnits;
+  if (bodyPosition <= 0) return -1;
+
+  let passedUnits = 0;
+  for (let index = 0; index < lineUnits.length; index++) {
+    passedUnits += lineUnits[index];
+    if (bodyPosition < passedUnits) return index;
+  }
+
+  return lineUnits.length - 1;
+}
+
+function highlightLine(index) {
+  if (index < 0) {
+    clearLineHighlights();
+    return;
+  }
+
+  const lineEl = document.getElementById(`poem-line-${index}`);
+  if (!lineEl) return;
+  if (currentLineIndex === index && lineEl.classList.contains('reading')) return;
+
+  clearLineHighlights();
+  lineEl.classList.add('reading');
+  currentLineIndex = index;
+  lineEl.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+}
+
+function syncPlaybackFrame() {
+  if (!poemAudio) return;
+
+  const duration = Number(poemAudio.duration) || 0;
+  const currentTime = Number(poemAudio.currentTime) || 0;
+  const progressRatio = duration > 0 ? Math.max(0, Math.min(1, currentTime / duration)) : 0;
+
+  updateProgress(progressRatio);
+  updateImageByProgress(progressRatio);
+
+  const activeLineIndex = getActiveLineIndex(progressRatio);
+  if (activeLineIndex >= 0) {
+    highlightLine(activeLineIndex);
+  } else {
+    clearLineHighlights();
+  }
+}
+
+// ==================== 初始化 ====================
+window.addEventListener('DOMContentLoaded', () => {
+  ensurePoemAudio();
+  updateVoiceButtons();
+  loadAudioManifest();
+  renderGrid();
+  setTimeout(() => document.getElementById('loading').classList.add('hide'), 600);
+});
+
+// ==================== 首页渲染 ====================
+function renderGrid(filter = '') {
+  const grid = document.getElementById('poemGrid');
+  const f = filter.toLowerCase();
+  const filtered = poems.filter(p =>
+    !f || p.title.includes(f) || p.author.includes(f) || (p.desc && p.desc.includes(f))
+  );
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty"><div class="icon">🔍</div><div>未找到相关诗词</div></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map((p, i) => {
+    const idx = poems.indexOf(p);
+    const preview = p.lines.map(l => l.map(c => c.c).join('')).join('，');
+    return `<div class="poem-card fade-in" onclick="openPoem(${idx})" style="animation-delay:${i*30}ms">
+      <div class="card-title">${p.title}</div>
+      <div class="card-author">${p.dynasty} · ${p.author}</div>
+      <div class="card-preview">${preview}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterPoems() {
+  renderGrid(document.getElementById('searchInput').value);
+}
+
+// ==================== 诗词详情 ====================
+function openPoem(idx) {
+  stopPlay();
+  currentPoemIndex = idx;
+  currentPoem = poems[idx];
+  currentCharIndex = 0;
+  currentLineIndex = -1;
+  currentImgIndex = 0;
+
+  document.getElementById('homeView').classList.add('hidden');
+  document.getElementById('detailView').classList.add('active');
+  document.getElementById('backBtn').style.display = 'block';
+
+  document.getElementById('poemTitle').textContent = currentPoem.title;
+  document.getElementById('poemAuthor').textContent = currentPoem.author;
+  document.getElementById('poemDynasty').textContent = currentPoem.dynasty;
+
+  // Render poem body with pinyin
+  const body = document.getElementById('poemBody');
+  body.innerHTML = currentPoem.lines.map((line, li) =>
+    `<div class="poem-line" id="poem-line-${li}">${line.map((ch, ci) =>
+      `<span class="char-group" data-line="${li}" data-char="${ci}">
+        <span class="pinyin">${ch.p}</span>
+        <span class="char">${ch.c}</span>
+      </span>`
+    ).join('')}</div>`
+  ).join('');
+
+  // Count total chars
+  totalChars = currentPoem.lines.reduce((s, l) => s + l.length, 0);
+
+  // Load images
+  loadImages(idx);
+  updateProgress(0);
+  clearLineHighlights();
+  preparePoemAudio(idx);
+  window.scrollTo(0, 0);
+}
+
+function goHome() {
+  stopPlay();
+  currentPoemIndex = null;
+  currentPoem = null;
+  document.getElementById('detailView').classList.remove('active');
+  document.getElementById('homeView').classList.remove('hidden');
+  document.getElementById('backBtn').style.display = 'none';
+  setAudioStatus('');
+}
+
+// ==================== 图片轮播 ====================
+function loadImages(idx) {
+  for (let i = 0; i < 3; i++) {
+    const img = document.getElementById('img' + i);
+    img.src = `images/${idx}_${i}.jpg`;
+    img.className = i === 0 ? 'active' : 'inactive';
+  }
+  currentImgIndex = 0;
+  updateDots();
+}
+
+function switchImage(newIdx) {
+  if (newIdx === currentImgIndex) return;
+  document.getElementById('img' + currentImgIndex).className = 'inactive';
+  document.getElementById('img' + newIdx).className = 'active';
+  currentImgIndex = newIdx;
+  updateDots();
+}
+
+function updateDots() {
+  document.querySelectorAll('.carousel-dots span').forEach((d, i) => {
+    d.className = i === currentImgIndex ? 'active' : '';
+  });
+}
+
+function updateImageByProgress(progressRatio) {
+  const clampedRatio = Math.max(0, Math.min(1, Number(progressRatio) || 0));
+  if (clampedRatio < 1/3) switchImage(0);
+  else if (clampedRatio < 2/3) switchImage(1);
+  else switchImage(2);
+}
+
+// ==================== 音频朗诵 ====================
+function togglePlay() {
+  if (isPlaying) {
+    pausePlay();
+  } else {
+    void startPlay({ reset: false });
+  }
+}
+
+async function startPlay(options = {}) {
+  if (!currentPoem || currentPoemIndex === null) return;
+  ensurePoemAudio();
+  const requestToken = invalidatePlaybackRequest();
+  const { reset = true } = options;
+  const resolvedTrack = resolveAudioTrack(currentPoemIndex, voiceMode);
+  if (!resolvedTrack || !poemAudio) {
+    preparePoemAudio(currentPoemIndex);
+    return;
+  }
+
+  const shouldResume =
+    !reset &&
+    poemAudio.dataset?.trackSrc === resolvedTrack.src &&
+    Number(poemAudio.currentTime) > 0;
+
+  const track = shouldResume ? resolvedTrack : preparePoemAudio(currentPoemIndex);
+  if (!track || !poemAudio) return;
+
+  isPlaying = true;
+  document.getElementById('playBtn').textContent = '⏸';
+  poemAudio.playbackRate = speechRate;
+
+  if (!shouldResume) {
+    currentCharIndex = 0;
+    currentLineIndex = -1;
+    poemAudio.currentTime = 0;
+    clearLineHighlights();
+    switchImage(0);
+    updateProgress(0);
+  }
+
+  try {
+    await poemAudio.play?.();
+    if (!isPlaybackRequestCurrent(requestToken)) return;
+    isPlaying = true;
+    document.getElementById('playBtn').textContent = '⏸';
+    setAudioStatus('');
+  } catch (error) {
+    if (!isPlaybackRequestCurrent(requestToken)) return;
+    isPlaying = false;
+    document.getElementById('playBtn').textContent = '▶';
+    setAudioStatus('当前音频加载失败');
+  }
+}
+
+function pausePlay() {
+  invalidatePlaybackRequest();
+  ensurePoemAudio();
+  poemAudio?.pause?.();
+  isPlaying = false;
+  document.getElementById('playBtn').textContent = '▶';
+}
+
+function stopPlay() {
+  invalidatePlaybackRequest();
+  ensurePoemAudio();
+  poemAudio?.pause?.();
+  if (poemAudio) poemAudio.currentTime = 0;
+  isPlaying = false;
+  document.getElementById('playBtn').textContent = '▶';
+  clearLineHighlights();
+  currentCharIndex = 0;
+  currentLineIndex = -1;
+  switchImage(0);
+  updateProgress(0);
+}
+
+function updateProgress(ratio = 0) {
+  const clampedRatio = Math.max(0, Math.min(1, Number(ratio) || 0));
+  const pct = Math.round(clampedRatio * 1000) / 10;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ==================== 语速控制 ====================
+function changeSpeed(delta) {
+  speechRate = Math.max(0.5, Math.min(2.0, speechRate + delta * 0.25));
+  document.getElementById('speedLabel').textContent = speechRate.toFixed(1) + 'x';
+  ensurePoemAudio();
+  if (poemAudio) {
+    poemAudio.playbackRate = speechRate;
+  }
+}
+</script>
+</body>
+</html>
