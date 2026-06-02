@@ -1,0 +1,12 @@
+{
+  "female": {
+    "label": "女声",
+    "model": ".local-tools/piper/voices/zh_CN-huayan-medium.onnx",
+    "config": ".local-tools/piper/voices/zh_CN-huayan-medium.onnx.json"
+  },
+  "child": {
+    "label": "童声",
+    "model": ".local-tools/piper/voices/zh_CN-xiao_ya-medium.onnx",
+    "config": ".local-tools/piper/voices/zh_CN-xiao_ya-medium.onnx.json"
+  }
+}
